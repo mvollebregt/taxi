@@ -3,6 +3,11 @@
     <ion-title>
       Ionic Blank
     </ion-title>
+    <ion-buttons slot="start">
+      <ion-button>
+        <ion-icon slot="icon-only" name="refresh" (click)="onRefreshClicked()"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -11,5 +16,7 @@
   <div text-center>
     <ion-button (click)="onVoegHuidigeLocatieToeClicked()">Huidige locatie toevoegen</ion-button>
   </div>
+
+  {{ log }}
 
 </ion-content>

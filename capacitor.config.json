@@ -1,0 +1,6 @@
+{
+  "appId": "com.github.mvollebregt.taxi",
+  "appName": "taxi",
+  "bundledWebRuntime": false,
+  "webDir": "www"
+}
