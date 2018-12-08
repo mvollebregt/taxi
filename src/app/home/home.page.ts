@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {AlertController} from '@ionic/angular';
 import {Plugins} from '@capacitor/core';
 import {GeofenceService} from '../shared/geofence.service';
+import {Storage} from '@ionic/storage';
 
 const {Geolocation} = Plugins;
 

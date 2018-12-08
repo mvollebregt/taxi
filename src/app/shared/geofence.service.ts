@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Geofence} from '@ionic-native/geofence/ngx';
+import {Storage} from '@ionic/storage';
 import * as moment from 'moment';
 
 @Injectable({
@@ -26,9 +27,9 @@ export class GeofenceService {
   }
 
   private async transitionReceived(geofence: {transitionType: number}) {
-    const log = await this.storage.getItem('log');
+    const log = await this.storage.get('log');
     const time = moment().format('dd DD MMM HH:mm');
     const status = geofence.transitionType === 1 ? 'Entered' : 'Exited';
-    this.storage.setItem('log', `${log}\n${time} ${status}`);
+    this.storage.set('log', `${log}\n${time} ${status}`);
   }
 }
