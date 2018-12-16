@@ -4,8 +4,8 @@
       Ionic Blank
     </ion-title>
     <ion-buttons slot="start">
-      <ion-button>
-        <ion-icon slot="icon-only" name="refresh" (click)="onRefreshClicked()"></ion-icon>
+      <ion-button (click)="onRefreshClicked()">
+        <ion-icon slot="icon-only" name="refresh"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -17,6 +17,8 @@
     <ion-button (click)="onVoegHuidigeLocatieToeClicked()">Huidige locatie toevoegen</ion-button>
   </div>
 
-  {{ log }}
+  <div *ngFor="let line of log">
+    {{ line }}
+  </div>
 
 </ion-content>

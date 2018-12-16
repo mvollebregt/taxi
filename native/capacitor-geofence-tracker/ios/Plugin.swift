@@ -4,13 +4,15 @@ import CoreLocation
 import os.log
 
 @objc(GeofenceTracker)
-public class GeofenceTracker: CAPPlugin {
+public class GeofenceTracker: CAPPlugin, CLLocationManagerDelegate {
    
+    let presencesKey = "presences";
     let locationManager = CLLocationManager()
+    let iso8601 = ISO8601DateFormatter()
     
     @objc func registerLocation(_ call: CAPPluginCall) {
         
-        guard   
+        guard
             let id = call.getString("id"),
             let latitude = call.getDouble("latitude"),
             let longitude = call.getDouble("longitude"),
@@ -22,6 +24,11 @@ public class GeofenceTracker: CAPPlugin {
         
         locationManager.requestAlwaysAuthorization();
         
+        os_log("%s", id);
+        os_log("lat %d", latitude);
+        os_log("long %d", longitude);
+        os_log("radius %d", radius);
+        
         let region = CLCircularRegion(
             center: CLLocationCoordinate2D(
                 latitude: latitude,
@@ -32,43 +39,71 @@ public class GeofenceTracker: CAPPlugin {
         region.notifyOnExit = true
 
         locationManager.startMonitoring(for: region)
-        os_log("het werkt!")
+        locationManager.delegate = self;
         
-        call.success()
-    }
-    
-    @objc func unregisterLocation(_ call: CAPPluginCall) {
-        guard
-            let id = call.getString("id")
-            else {
-                call.error("id must not be nil")
-                return
-        }
-        // TODO
         call.success()
     }
     
     @objc func getTrackedPresences(_ call: CAPPluginCall) {
+        os_log("return values!");
+       
+        var result: [Presence] = [];
+        let presences = getPresences();
+        for presencesForRegion in presences.values {
+            result.append(contentsOf: presencesForRegion)
+        }
         
-        NSLog("Getting tracked presences")
-        
-        call.success(["presences": [
-            "location": [
-                "id": "somewhere",
-                "latitude": 300.23,
-                "longitude": 400.23,
-                "radius": 2000.1,
-            ],
-            "start": "1976-07-13T23:05:01Z",
-            "end": "2100-07-13T23:05:01Z"
-        ]])
+        call.success(["presences": result])
     }
     
-    @objc func echo(_ call: CAPPluginCall) {
-        print("echo!");
-        let value = call.getString("value") ?? ""
-        call.success([
-            "value": value
-        ])
+    private func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        os_log("did enter!");
+        if let region = region as? CLCircularRegion {
+            var presences = getPresences(forRegion: region);
+            let newPresence = Presence(id: region.identifier, start: now(), end: nil);
+            presences.append(newPresence);
+            setPresences(presences, forRegion: region);
+        }
     }
+    
+    private func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+        os_log("did exit!");
+        if let region = region as? CLCircularRegion {
+            var presences = getPresences(forRegion: region);
+            if var lastPresence = presences.last, lastPresence.end == nil {
+                lastPresence.end = now();
+            } else {
+                let newPresence = Presence(id: region.identifier, start: nil, end: now());
+                presences.append(newPresence);
+            }
+            setPresences(presences, forRegion: region);
+        }
+    }
+    
+    private func getPresences(forRegion region: CLRegion) -> [Presence] {
+        return getPresences()[region.identifier] ?? [];
+    }
+    
+    private func setPresences(_ presences: [Presence], forRegion region: CLRegion) {
+        let defaults = UserDefaults.standard
+        var allPresences = getPresences();
+        allPresences[region.identifier] = presences;
+        defaults.set(presences, forKey: presencesKey);
+    }
+    
+    private func getPresences() -> [String: [Presence]] {
+        let defaults = UserDefaults.standard
+        let presences = (defaults.dictionary(forKey: presencesKey) ?? [:]) as! [String: [Presence]];
+        return presences;
+    }
+    
+    private func now() -> String {
+        return iso8601.string(from: Date())
+    }
+}
+
+struct Presence {
+    var id: String
+    var start: String?
+    var end: String?
 }

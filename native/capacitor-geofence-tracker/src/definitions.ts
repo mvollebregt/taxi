@@ -5,9 +5,8 @@ declare global {
 }
 
 export interface GeofenceTrackerPlugin {
-  registerLocation(location: GeofenceLocation): Promise<void>;
 
-  unregisterLocation(id: string): Promise<void>;
+  registerLocation(location: GeofenceLocation): Promise<void>;
 
   getTrackedPresences(): Promise<{ presences: GeofencePresence[] }>;
 }
@@ -20,7 +19,7 @@ export interface GeofenceLocation {
 }
 
 export interface GeofencePresence {
-  location: GeofenceLocation;
+  id: string;
   start: string;
   end: string;
 }
