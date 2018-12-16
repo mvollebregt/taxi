@@ -1,10 +1,9 @@
 import {Component} from '@angular/core';
 import {AlertController} from '@ionic/angular';
 import {Plugins} from '@capacitor/core';
-import {GeofenceService} from '../shared/geofence.service';
-import {Storage} from '@ionic/storage';
+import 'native/capacitor-geofence-tracker/src';
 
-const {Geolocation} = Plugins;
+const {Geolocation, GeofenceTracker} = Plugins;
 
 @Component({
   selector: 'app-home',
@@ -15,9 +14,8 @@ export class HomePage {
 
   log: string;
 
-  constructor(private alertController: AlertController,
-              private geofenceService: GeofenceService,
-              private storage: Storage) {
+  constructor(
+    private alertController: AlertController) {
   }
 
   async onRefreshClicked() {
@@ -31,7 +29,8 @@ Nam pretium turpis et arcu. Duis arcu tortor, suscipit eget, imperdiet nec, impe
 
   async onVoegHuidigeLocatieToeClicked() {
     const coordinates = await Geolocation.getCurrentPosition();
-    await this.geofenceService.addLocation({id: 'locatie', ...coordinates.coords});
+    console.log(Plugins);
+    await GeofenceTracker.registerLocation({id: 'locatie', ...coordinates.coords, radius: 500});
     const alert = await this.alertController.create({
       header: 'Toegevoegd',
       message: `Locatie is toegevoegd`

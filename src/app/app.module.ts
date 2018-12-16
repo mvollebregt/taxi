@@ -8,7 +8,6 @@ import {StatusBar} from '@ionic-native/status-bar/ngx';
 
 import {AppComponent} from './app.component';
 import {AppRoutingModule} from './app-routing.module';
-import {Geofence} from '@ionic-native/geofence/ngx';
 import {IonicStorageModule} from '@ionic/storage';
 
 @NgModule({
@@ -16,7 +15,6 @@ import {IonicStorageModule} from '@ionic/storage';
   entryComponents: [],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, IonicStorageModule.forRoot()],
   providers: [
-    Geofence,
     StatusBar,
     SplashScreen,
     {provide: RouteReuseStrategy, useClass: IonicRouteStrategy}
