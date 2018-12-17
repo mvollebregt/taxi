@@ -22,13 +22,13 @@ export class HomePage {
     const presences = await GeofenceTracker.getTrackedPresences();
     this.log = [
       'Gevonden: ',
-      ...presences.presences.map(presence => `${presence.id} ${presence.start} - ${presence.end}]n`)
+      ...presences.presences.map(presence => `${presence.id} ${presence.start} - ${presence.end}`)
     ];
   }
 
   async onVoegHuidigeLocatieToeClicked() {
     const coordinates = await Geolocation.getCurrentPosition();
-    console.log(coordinates);
+    console.log({id: 'locatie', ...coordinates.coords, radius: 500});
     await GeofenceTracker.registerLocation({id: 'locatie', ...coordinates.coords, radius: 500});
     const alert = await this.alertController.create({
       header: 'Toegevoegd',
